@@ -9,6 +9,7 @@ dependencies = [
     "dishka>=1.6.0",
     "fastapi[standard]>=0.116.1",
     "pydantic-settings>=2.10.1",
+    "pytest>=8.4.1",
     "ruff>=0.12.8",
     "sqlalchemy[asyncio]>=2.0.43",
 ]
