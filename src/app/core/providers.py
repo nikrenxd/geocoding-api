@@ -1,8 +1,6 @@
 from dishka import (
-    AsyncContainer,
     Provider,
     Scope,
-    make_async_container,
     provide,
 )
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
@@ -34,10 +32,3 @@ class DatabaseProvider(Provider):
 class ServicesProvider(Provider):
     geodata_repository = provide(GeodataRepository)
     geodata_service = provide(GeodataService)
-
-
-def create_container() -> AsyncContainer:
-    return make_async_container(
-        DatabaseProvider(),
-        ConfigProvider(),
-    )
