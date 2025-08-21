@@ -1,4 +1,5 @@
 import asyncio
+import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -6,9 +7,7 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from src.app.config import Settings
-from src.app.database import Base as Base
-from src.app.providers import container
+from src.app.core.database import Base as Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -18,6 +17,8 @@ config = context.config
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+config.set_main_option("sqlalchemy.url", os.getenv("DB_URL"))
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -67,8 +68,6 @@ async def run_async_migrations() -> None:
     and associate a connection with the context.
 
     """
-    _config = await container.get(Settings)
-    config.set_main_option("sqlalchemy.url", _config.DB_URL)
 
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
