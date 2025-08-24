@@ -11,6 +11,8 @@ from src.app.core.config import Settings
 
 def create_engine(config: Settings) -> AsyncEngine:
     engine = create_async_engine(config.DB_URL)
+    if config.ENV == "TEST":
+        engine = create_async_engine(config.TEST_DB_URL)
 
     return engine
 
@@ -19,4 +21,5 @@ def create_session(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(engine, expire_on_commit=False)
 
 
-class Base(DeclarativeBase): ...
+class Base(DeclarativeBase):
+    __abstract__ = True
