@@ -4,11 +4,12 @@ from dishka import make_async_container
 from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 
-from src.app.api import router
+from src.app.api.v1.routes import router
 from src.app.core.providers import (
     ConfigProvider,
     DatabaseProvider,
-    ServicesProvider,
+    RepositoryProvider,
+    ServiceProvider,
 )
 
 
@@ -29,7 +30,8 @@ def create_app(_lifespan) -> FastAPI:
     container = make_async_container(
         DatabaseProvider(),
         ConfigProvider(),
-        ServicesProvider(),
+        RepositoryProvider(),
+        ServiceProvider(),
     )
     setup_dishka(container, _app)
 
