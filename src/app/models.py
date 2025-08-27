@@ -11,7 +11,7 @@ class Geodata(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    displayed_name: Mapped[str]
+    display_name: Mapped[str]
     lat: Mapped[float]
     lon: Mapped[float]
     created_at: Mapped[datetime] = mapped_column(
