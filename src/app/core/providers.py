@@ -1,3 +1,5 @@
+from collections.abc import AsyncIterable
+
 from dishka import (
     Provider,
     Scope,
@@ -22,13 +24,27 @@ class DatabaseProvider(Provider):
     def get_engine(self, config: Settings) -> AsyncEngine:
         return create_engine(config)
 
-    @provide(scope=Scope.REQUEST)
-    def get_session(
+    @provide(scope=Scope.APP)
+    def get_session_maker(
         self, engine: AsyncEngine
     ) -> async_sessionmaker[AsyncSession]:
         return create_session(engine)
 
 
-class ServicesProvider(Provider):
+class RepositoryProvider(Provider):
+    scope = Scope.REQUEST
+
+    @provide
+    async def get_session(
+        self, session_maker: async_sessionmaker[AsyncSession]
+    ) -> AsyncIterable[AsyncSession]:
+        async with session_maker() as session:
+            yield session
+
     geodata_repository = provide(GeodataRepository)
+
+
+class ServiceProvider(Provider):
+    scope = Scope.REQUEST
+
     geodata_service = provide(GeodataService)
