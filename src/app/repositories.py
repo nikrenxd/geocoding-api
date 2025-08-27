@@ -1,5 +1,4 @@
-from sqlalchemy import insert
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.models import Geodata
@@ -9,22 +8,15 @@ class GeodataRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def save_data(
-        self, address: str, lat: float, lon: float
-    ) -> str | None:
-        try:
-            async with self.session() as session:
-                stmt = (
-                    insert(Geodata)
-                    .values(
-                        displayed_name=address,
-                        lat=lat,
-                        lon=lon,
-                    )
-                    .returning(Geodata.displayed_name)
-                )
-                result = await session.execute(stmt)
-                await session.commit()
-                return result.scalar()
-        except SQLAlchemyError:
-            pass
+    async def get_all(self) -> list[Geodata]:
+        stmt = select(Geodata).distinct()
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def save_data(self, data: list[dict]) -> list[Geodata] | None:
+        result = await self.session.execute(
+            insert(Geodata).returning(Geodata),
+            [*data],
+        )
+        await self.session.commit()
+        return result.scalars().all()
