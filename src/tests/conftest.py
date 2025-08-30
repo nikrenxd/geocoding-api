@@ -2,13 +2,14 @@ from collections.abc import AsyncIterable
 
 import pytest
 from dishka import AsyncContainer, make_async_container
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from src.app.core.config import Settings
 from src.app.core.database import Base
 from src.app.core.providers import (
     ConfigProvider,
     DatabaseProvider,
+    RepositoryProvider,
 )
 from src.app.repositories import GeodataRepository
 
@@ -23,9 +24,15 @@ async def container() -> AsyncIterable[AsyncContainer]:
     container = make_async_container(
         DatabaseProvider(),
         ConfigProvider(),
+        RepositoryProvider(),
     )
     yield container
     await container.close()
+
+
+@pytest.fixture()
+async def config(container) -> Settings:
+    return await container.get(Settings)
 
 
 @pytest.fixture()
@@ -36,7 +43,7 @@ async def request_container(container: AsyncContainer):
 
 @pytest.fixture()
 async def async_session(request_container: AsyncContainer):
-    return await request_container.get(async_sessionmaker[AsyncSession])
+    return await request_container.get(AsyncSession)
 
 
 @pytest.fixture()
