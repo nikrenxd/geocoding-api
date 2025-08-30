@@ -6,17 +6,57 @@ from src.app.repositories import GeodataRepository
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
-    "address,lat,lon",
-    (
-        ("Test1", 22.12, 23.11),
-        ("Test2", 13.129, -111.9019),
-        ("Test2", 58.12918, -127.9819),
-    ),
+    "data,expected",
+    [
+        (
+            {"display_name": "test1", "lat": 51.6, "lon": -0.1},
+            "test1",
+        ),
+        (
+            {"display_name": "test2", "lat": 51.1, "lon": -0.2},
+            "test2",
+        ),
+    ],
 )
 async def test_save_data(
-    async_session: AsyncSession, address: str, lat: float, lon: float
+    async_session: AsyncSession,
+    data: dict,
+    expected: str,
 ):
     geodata_repo = GeodataRepository(session=async_session)
-    res = await geodata_repo.save_data(address=address, lat=lat, lon=lon)
+    res = await geodata_repo.save_data(data)
 
-    assert res == address
+    assert res.display_name == expected
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "data,expected",
+    [
+        (
+            [
+                {"display_name": "test1", "lat": 51.6, "lon": -0.1},
+                {"display_name": "test2", "lat": 102.1, "lon": -0.2579},
+                {"display_name": "test3", "lat": 59.9123, "lon": -0.1223},
+            ],
+            [
+                "test1",
+                "test2",
+                "test3",
+            ],
+        ),
+    ],
+)
+async def test_save_data_list(
+    async_session: AsyncSession, data: list[dict], expected: list[str]
+):
+    geodata_repo = GeodataRepository(session=async_session)
+    res = await geodata_repo.save_data_list(data)
+
+    assert len(res) == len(expected)
+    assert all(
+        [
+            geodata.display_name == ex
+            for geodata, ex in zip(res, expected, strict=False)
+        ]
+    )
