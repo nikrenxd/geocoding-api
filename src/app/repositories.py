@@ -13,10 +13,16 @@ class GeodataRepository:
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def save_data(self, data: list[dict]) -> list[Geodata] | None:
+    async def save_data_list(self, data: list[dict]) -> list[Geodata] | None:
         result = await self.session.execute(
             insert(Geodata).returning(Geodata),
             [*data],
         )
         await self.session.commit()
         return result.scalars().all()
+
+    async def save_data(self, data: dict) -> Geodata | None:
+        stmt = insert(Geodata).values(**data).returning(Geodata)
+        result = await self.session.execute(stmt)
+        await self.session.commit()
+        return result.scalar()
