@@ -10,7 +10,8 @@ class Settings(BaseSettings):
     DB_URL: str
     TEST_DB_URL: str
     API_KEY: str
-    model_config = SettingsConfigDict(env_file=".env")
+
+    model_config = SettingsConfigDict(env_file=".env", extra="allow")
 
 
 def create_config() -> Settings:
