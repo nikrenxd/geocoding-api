@@ -13,20 +13,36 @@ services:
       - .:/app/
     depends_on:
       - postgres
+      - rabbitmq
 
   postgres:
     image: postgres:17-alpine
     container_name: postgresdb
-    ports:
-      - "5432:5432"
     env_file:
       - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  rabbitmq:
+    image: rabbitmq:4.0-management-alpine
+    container_name: rabbit
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RMQ_DEFAULT_PASS}
+      RABBITMQ_DEFAULT_VHOST: ${RMQ_DEFAULT_VHOST}
+    ports:
+      - "${RMQ_PORT}:5672"
+      - "${RMQ_DASHBOARD_PORT}:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
 
 volumes:
   pgdata:
+  rabbitmq-data:
