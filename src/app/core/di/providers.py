@@ -30,21 +30,21 @@ class DatabaseProvider(Provider):
     ) -> async_sessionmaker[AsyncSession]:
         return create_session(engine)
 
-
-class RepositoryProvider(Provider):
-    scope = Scope.REQUEST
-
-    @provide
+    @provide(scope=Scope.REQUEST)
     async def get_session(
         self, session_maker: async_sessionmaker[AsyncSession]
     ) -> AsyncIterable[AsyncSession]:
         async with session_maker() as session:
             yield session
 
+
+class RepositoriesProvider(Provider):
+    scope = Scope.REQUEST
+
     geodata_repository = provide(GeodataRepository)
 
 
-class ServiceProvider(Provider):
+class ServicesProvider(Provider):
     scope = Scope.REQUEST
 
     geodata_service = provide(GeodataService)
