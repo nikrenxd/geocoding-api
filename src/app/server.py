@@ -1,22 +1,20 @@
 from contextlib import asynccontextmanager
 
-from dishka import make_async_container
 from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 
 from src.app.api.v1.routes import router
-from src.app.core.providers import (
-    ConfigProvider,
-    DatabaseProvider,
-    RepositoryProvider,
-    ServiceProvider,
-)
+from src.app.core.di.setup import setup_container
+from src.app.core.tkq.broker import pika_broker
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI):
+    await pika_broker.startup()
     yield
-    await app.state.dishka_container.close()
+    await pika_broker.shutdown()
+
+    await _app.state.dishka_container.close()
 
 
 def setup_app(_lifespan) -> FastAPI:
@@ -26,15 +24,10 @@ def setup_app(_lifespan) -> FastAPI:
 
 
 def create_app(_lifespan) -> FastAPI:
-    _app = setup_app(_lifespan)
-    container = make_async_container(
-        DatabaseProvider(),
-        ConfigProvider(),
-        RepositoryProvider(),
-        ServiceProvider(),
-    )
-    setup_dishka(container, _app)
+    container = setup_container()
 
+    _app = setup_app(_lifespan)
+    setup_dishka(container, _app)
     return _app
 
 
