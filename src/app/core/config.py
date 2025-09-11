@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     EXTERNAL_API_URL: str
     EXTERNAL_COORD_API_URL: str
     DB_URL: str
+    RMQ_URL: str
+    REDIS_URL: str
     TEST_DB_URL: str
     API_KEY: str
 
