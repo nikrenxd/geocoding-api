@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.app.core.config import Settings
 from src.app.core.database import Base as Base
-from src.app.core.providers import ConfigProvider
+from src.app.core.di.providers import ConfigProvider
 from src.app.models import Geodata as Geodata
 
 # this is the Alembic Config object, which provides
