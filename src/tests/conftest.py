@@ -1,16 +1,12 @@
 from collections.abc import AsyncIterable
 
 import pytest
-from dishka import AsyncContainer, make_async_container
+from dishka import AsyncContainer
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from src.app.core.config import Settings
 from src.app.core.database import Base
-from src.app.core.providers import (
-    ConfigProvider,
-    DatabaseProvider,
-    RepositoryProvider,
-)
+from src.app.core.di.setup import setup_container
 from src.app.repositories import GeodataRepository
 
 
@@ -21,11 +17,7 @@ def anyio_backend():
 
 @pytest.fixture()
 async def container() -> AsyncIterable[AsyncContainer]:
-    container = make_async_container(
-        DatabaseProvider(),
-        ConfigProvider(),
-        RepositoryProvider(),
-    )
+    container = setup_container()
     yield container
     await container.close()
 
@@ -61,6 +53,4 @@ async def setup_test_db(container: AsyncContainer):
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
     else:
-        raise RuntimeError(
-            f"Tests should run in TEST environment not in {config.ENV}"
-        )
+        raise RuntimeError(f"Tests should run in TEST environment not in {config.ENV}")
