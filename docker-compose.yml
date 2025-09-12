@@ -15,6 +15,8 @@ services:
       - postgres
       - rabbitmq
       - redis
+    networks:
+      - geocoding
 
   taskiq-worker:
     <<: *web-app
@@ -38,12 +40,16 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - geocoding
 
   redis:
     image: redis:8-alpine3.21
     container_name: redis
     ports:
       - "${REDIS_PORT}:6379"
+    networks:
+        - geocoding
 
   rabbitmq:
     image: rabbitmq:4.0-management-alpine
@@ -59,7 +65,12 @@ services:
       - "${RMQ_DASHBOARD_PORT}:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - geocoding
 
+networks:
+  geocoding:
+    driver: bridge
 volumes:
   pgdata:
   rabbitmq-data:
