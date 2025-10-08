@@ -21,19 +21,16 @@ class GeodataService:
 
         return new_data
 
-    def _validate_data_list(self, data: list[dict]) -> list[dict]:
-        return [self._convert_json_data(d) for d in data]
-
     def _validate_data(self, data: dict) -> dict:
         return self._convert_json_data(data)
 
     async def _request_data_from_api(
-        self, many: bool, **url_params
+        self, from_name: bool, **url_params
     ) -> list[dict] | dict:
         async with AsyncClient() as client:
             api_url = (
                 self.config.EXTERNAL_API_URL
-                if many
+                if from_name
                 else self.config.EXTERNAL_COORD_API_URL
             )
             response = await client.get(
@@ -41,20 +38,17 @@ class GeodataService:
                 params={**url_params, "api_key": self.config.API_KEY},
             )
         response_data = response.json()
-        if many:
-            return self._validate_data_list(response_data)
+        if from_name:
+            return self._validate_data(response_data[0])
         return self._validate_data(response_data)
 
-    async def get_all_data(self) -> list[Geodata]:
-        return await self.repository.get_all()
-
     async def get_location_data_from_location_name(
-        self, **url_params
+        self, query: str
     ) -> list[Geodata] | Geodata | None:
-        response = await self._request_data_from_api(True, **url_params)
-        if len(response) == 0:
+        response = await self._request_data_from_api(True, q=query)
+        if not response:
             return None
-        return await self.repository.save_data_list(response)
+        return await self.repository.save_data(response)
 
     async def get_location_data_from_coords(self, **url_params) -> Geodata | None:
         response = await self._request_data_from_api(False, **url_params)
