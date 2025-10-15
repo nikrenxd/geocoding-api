@@ -6,7 +6,7 @@ from src.app.api.v1.schemas import (
     GeodataLocationResponse,
     GeodataResponse,
 )
-from src.app.services import GeodataService
+from src.app.services.geodata.service import GeodataService
 
 router = APIRouter(prefix="/api/geocode", tags=["location"])
 

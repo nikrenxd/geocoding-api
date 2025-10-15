@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from src.app.api.v1.routes import router
 from src.app.core.di.setup import setup_container
+from src.app.core.logging import setup_logging
 from src.app.core.tkq.broker import pika_broker
 
 
@@ -27,6 +28,7 @@ def create_app(_lifespan) -> FastAPI:
     container = setup_container()
 
     _app = setup_app(_lifespan)
+    setup_logging()
     setup_dishka(container, _app)
     return _app
 

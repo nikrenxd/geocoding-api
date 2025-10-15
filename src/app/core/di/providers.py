@@ -9,8 +9,9 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from src.app.core.config import Settings, create_config
 from src.app.core.database import create_engine, create_session
-from src.app.repositories import GeodataRepository
-from src.app.services import GeodataService
+from src.app.repositories.geodata import GeodataRepository
+from src.app.services.geodata.client import GeodataClient
+from src.app.services.geodata.service import GeodataService
 
 
 class ConfigProvider(Provider):
@@ -47,4 +48,5 @@ class RepositoriesProvider(Provider):
 class ServicesProvider(Provider):
     scope = Scope.REQUEST
 
+    geodata_client = provide(GeodataClient)
     geodata_service = provide(GeodataService)
