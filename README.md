@@ -26,7 +26,12 @@ Run project via docker compose
 ### Applying migrations
 Create tables before using project
 ```shell
-  docker compose exec web uv run alembic upgrade head    
+  docker compose exec web-app uv run alembic upgrade head    
+```
+
+### Run tests
+```shell
+  docker compose exec web-app pytest
 ```
 
 ## Endpoints
